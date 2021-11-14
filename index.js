@@ -36,7 +36,7 @@ async function run() {
             const query = { _id: ObjectId(id) }
             const singleLipstick = await lipsticksCollection.findOne(query);
             res.json(singleLipstick);
-        })
+        });
 
         // POST api for lipsticks order 
         app.post('/orders', async (req, res) => {
@@ -45,6 +45,31 @@ async function run() {
             console.log(result);
             res.send(result)
         })
+
+        // GET API FOR MANAGE ALL ORDERS & MY ORDERS 
+        app.get('/orders', async (req, res) => {
+            const email = req.query.email;
+            if (email) {
+                const query = { email: email }
+                const cursor = orderCollection.find(query);
+                const myOrders = await cursor.toArray();
+                res.json(myOrders);
+            }
+            else {
+                const cursor = orderCollection.find({});
+                const orders = await cursor.toArray();
+                res.json(orders);
+            }
+        })
+        // DELETE API FOR ORDERS 
+        app.delete('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            // console.log('going to delete na order', id);
+            const query = { _id: ObjectId(id) }
+            const result = await orderCollection.deleteOne(query);
+            // console.log(result)
+            res.send(result);
+        });
 
     }
     finally {
